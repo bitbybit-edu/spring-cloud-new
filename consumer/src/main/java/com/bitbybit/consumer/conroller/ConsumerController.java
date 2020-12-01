@@ -12,11 +12,18 @@ public class ConsumerController {
     @Autowired
     ProviderApi providerApi;
 
-    AtomicInteger atomicInteger = new AtomicInteger();
+	@GetMapping("consumer/ratelimiter")
+	public Integer ratelimiter() {
 
-	@GetMapping("consumer/consumer")
-	public Integer consumer() {
-		System.out.println(atomicInteger.incrementAndGet());
-        return providerApi.provider();
+        return providerApi.ratelimiter();
 	}
+
+    @GetMapping("consumer/bulkhead")
+    public Integer bulkhead() {
+
+        return providerApi.bulkhead();
+    }
+
+
+
 }
