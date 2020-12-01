@@ -2,6 +2,7 @@ package com.bitbybit.consumer.conroller;
 
 import com.bitbybit.consumer.remote.api.ProviderApi;
 import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
@@ -47,6 +48,34 @@ public class ConsumerController {
         result.put("bulkhead",bulkheads);
         result.put("rateLimiter", rateLimiters);
         return result;
+    }
+
+    @GetMapping("consumer/config/change")
+    public Map<String, List> configChange() {
+        Seq<RateLimiter> allRateLimiters = rateLimiterRegistry.getAllRateLimiters();
+        Seq<Bulkhead> allBulkheads = bulkheadRegistry.getAllBulkheads();
+
+        allBulkheads.forEach(bulkhead -> a(bulkhead));
+
+
+
+
+        Map<String, List> result = new HashMap<>();
+        List<Bulkhead> bulkheads = allBulkheads.collect(Collectors.toList());
+        List<RateLimiter> rateLimiters = allRateLimiters.collect(Collectors.toList());
+        result.put("bulkhead",bulkheads);
+        result.put("rateLimiter", rateLimiters);
+        return result;
+    }
+
+    private void a(Bulkhead bulkhead) {
+        if (bulkhead.getName().equals("provider")) {
+            BulkheadConfig bulkheadConfig = bulkhead.getBulkheadConfig();
+            int maxConcurrentCalls = bulkheadConfig.getMaxConcurrentCalls() + 1;
+            BulkheadConfig build = BulkheadConfig.from(bulkheadConfig).maxConcurrentCalls(maxConcurrentCalls).build();
+            bulkhead.changeConfig(build);
+        }
+
     }
 
 }
