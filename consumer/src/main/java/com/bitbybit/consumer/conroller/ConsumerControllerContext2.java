@@ -1,6 +1,7 @@
 package com.bitbybit.consumer.conroller;
 
 import com.bitbybit.consumer.remote.api.ProviderApi;
+import com.bitbybit.consumer.remote.api.ProviderApiContext2;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
@@ -15,13 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @RestController
-public class ConsumerController {
+public class ConsumerControllerContext2 {
     @Autowired
-    ProviderApi providerApi;
+    ProviderApiContext2 providerApi;
 
     @Autowired
     RateLimiterRegistry rateLimiterRegistry;
@@ -29,22 +29,22 @@ public class ConsumerController {
     @Autowired
     BulkheadRegistry bulkheadRegistry;
 
-    @GetMapping("consumer/ratelimiter")
+    @GetMapping("consumer/context2/ratelimiter")
     public Integer ratelimiter() {
         return providerApi.ratelimiter();
     }
 
-    @GetMapping("consumer/bulkhead")
+    @GetMapping("consumer/context2/bulkhead")
     public Integer bulkhead() {
         return providerApi.bulkhead();
     }
 
-    @GetMapping("consumer/ratelimiterAndBulkhead")
+    @GetMapping("consumer/context2/ratelimiterAndBulkhead")
     public Integer ratelimiterAndBulkhead() {
         return providerApi.ratelimiterAndBulkhead();
     }
 
-    @GetMapping("consumer/config")
+    @GetMapping("consumer/context2/config")
     public Map<String, List> config() {
         Seq<RateLimiter> allRateLimiters = rateLimiterRegistry.getAllRateLimiters();
         Seq<Bulkhead> allBulkheads = bulkheadRegistry.getAllBulkheads();
@@ -56,13 +56,12 @@ public class ConsumerController {
         return result;
     }
 
-    @GetMapping("consumer/config/change")
+    @GetMapping("consumer/context2/config/change")
     public Map<String, List> configChange() {
         Seq<RateLimiter> allRateLimiters = rateLimiterRegistry.getAllRateLimiters();
         Seq<Bulkhead> allBulkheads = bulkheadRegistry.getAllBulkheads();
-
         allBulkheads.forEach(bulkhead -> a(bulkhead));
-
+        
 
         Map<String, List> result = new HashMap<>();
         List<Bulkhead> bulkheads = allBulkheads.collect(Collectors.toList());

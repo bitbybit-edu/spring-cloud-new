@@ -5,8 +5,10 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@FeignClient(name = "PROVIDER",contextId = "context1")
-public interface ProviderApi {
+@FeignClient(name = "PROVIDER",contextId = "context2")
+@RateLimiter(name = "provider", fallbackMethod = "rateLimiterFallback")
+@Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "bulkheadFallback")
+public interface ProviderApiContext2 {
 
     default Integer rateLimiterFallback(Throwable throwable) {
         System.out.println(throwable);
@@ -19,16 +21,15 @@ public interface ProviderApi {
     }
 
     @GetMapping("provider/ratelimiter")
-    @RateLimiter(name = "provider", fallbackMethod = "rateLimiterFallback")
+//    @RateLimiter(name = "provider", fallbackMethod = "rateLimiterFallback")
     Integer ratelimiter();
 
     @GetMapping("provider/bulkhead")
-    @Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "bulkheadFallback")
+//    @Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "bulkheadFallback")
     Integer bulkhead();
 
     @GetMapping("provider/ratelimiterAndBulkhead")
-    @RateLimiter(name = "provider", fallbackMethod = "rateLimiterFallback")
-    @Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "bulkheadFallback")
+//    @RateLimiter(name = "provider", fallbackMethod = "rateLimiterFallback")
+//    @Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "bulkheadFallback")
     Integer ratelimiterAndBulkhead();
-
 }
