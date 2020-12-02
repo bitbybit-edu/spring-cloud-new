@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(name = "PROVIDER",contextId = "context1")
 public interface ProviderApi {
 
+    /**
+     * 可以打印参数
+     * @param throwable
+     * @return
+     */
     default Integer rateLimiterFallback(Throwable throwable) {
         System.out.println(throwable);
         return -1;

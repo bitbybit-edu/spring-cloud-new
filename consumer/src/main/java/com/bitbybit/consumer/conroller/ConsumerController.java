@@ -1,6 +1,11 @@
 package com.bitbybit.consumer.conroller;
 
+import com.alibaba.csp.sentinel.slots.block.RuleConstant;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import com.bitbybit.consumer.remote.api.ProviderApi;
+import com.bitbybit.consumer.remote.api.ProviderApiSentinel;
+import com.bitbybit.consumer.service.ProviderService;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
@@ -12,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +35,9 @@ public class ConsumerController {
 
     @Autowired
     BulkheadRegistry bulkheadRegistry;
+
+    @Autowired
+    ProviderService providerService;
 
     @GetMapping("consumer/ratelimiter")
     public Integer ratelimiter() {
@@ -81,7 +91,11 @@ public class ConsumerController {
             BulkheadConfig build = BulkheadConfig.from(bulkheadConfig).maxConcurrentCalls(maxConcurrentCalls).build();
             bulkhead.changeConfig(build);
         }
-
     }
 
+
+    @GetMapping("consumer/sentinel")
+    public Integer seninel() {
+        return providerService.seninel(123L);
+    }
 }
