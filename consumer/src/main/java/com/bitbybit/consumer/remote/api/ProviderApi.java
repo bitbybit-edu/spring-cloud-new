@@ -8,17 +8,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(name = "PROVIDER")
 public interface ProviderApi {
 
-    @GetMapping("provider/ratelimiter")
-    @RateLimiter(name = "provider", fallbackMethod = "providerFallback")
-    Integer ratelimiter();
-
-    default Integer providerFallback(Throwable throwable) {
+    default Integer rateLimiterFallback(Throwable throwable) {
         System.out.println(throwable);
         return -1;
     }
 
+    default Integer bulkheadFallback(Throwable throwable) {
+        System.out.println(throwable);
+        return -2;
+    }
+
+    @GetMapping("provider/ratelimiter")
+    @RateLimiter(name = "provider", fallbackMethod = "rateLimiterFallback")
+    Integer ratelimiter();
+
     @GetMapping("provider/bulkhead")
-    @Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "providerFallback")
+    @Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "bulkheadFallback")
     Integer bulkhead();
+
+    @GetMapping("provider/ratelimiterAndBulkhead")
+    @RateLimiter(name = "provider", fallbackMethod = "rateLimiterFallback")
+    @Bulkhead(name = "provider",type = Bulkhead.Type.SEMAPHORE, fallbackMethod = "bulkheadFallback")
+    Integer ratelimiterAndBulkhead();
 
 }

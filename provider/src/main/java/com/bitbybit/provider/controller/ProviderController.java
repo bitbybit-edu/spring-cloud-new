@@ -14,6 +14,8 @@ public class ProviderController {
 
     AtomicInteger bulkhead = new AtomicInteger();
 
+    AtomicInteger ratelimiterAndBulkhead = new AtomicInteger();
+
     @GetMapping("ratelimiter")
     public Integer ratelimiter() {
         return ratelimiter.incrementAndGet();
@@ -28,5 +30,15 @@ public class ProviderController {
             e.printStackTrace();
         }
         return bulkhead.incrementAndGet();
+    }
+
+    @GetMapping("ratelimiterAndBulkhead")
+    public Integer ratelimiterAndBulkhead() {
+        try {
+            Thread.sleep(10 * 1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ratelimiterAndBulkhead.incrementAndGet();
     }
 }
