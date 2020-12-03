@@ -17,16 +17,6 @@ import java.util.List;
 @FeignClient(name = "PROVIDER",contextId = "context3")
 public interface ProviderApiSentinel {
 
-    default Integer rateLimiterFallback(Throwable throwable) {
-        System.out.println(throwable);
-        return -1;
-    }
-
-    default Integer bulkheadFallback(Throwable throwable) {
-        System.out.println(throwable);
-        return -2;
-    }
-
     @GetMapping("provider/ratelimiter")
     Integer sentinel();
 

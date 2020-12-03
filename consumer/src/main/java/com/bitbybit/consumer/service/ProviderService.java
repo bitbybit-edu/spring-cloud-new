@@ -27,12 +27,12 @@ public class ProviderService {
     }
 
     // Fallback 函数，函数签名与原函数一致或加一个 Throwable 类型的参数.
-    public Integer helloFallback(long s) {
+    public Integer helloFallback(Long s) {
         return -3;
     }
 
     // Block 异常处理函数，参数最后多一个 BlockException，其余与原函数一致.
-    public Integer exceptionHandler(long s, BlockException ex) {
+    public Integer exceptionHandler(Long s, BlockException ex) {
         // Do some log here.
         ex.printStackTrace();
         return -4;
@@ -45,15 +45,4 @@ public class ProviderService {
 //        System.out.println("Test");
 //    }
 
-    @PostConstruct
-    void initFlowRules() {
-        List<FlowRule> rules = new ArrayList<>();
-        FlowRule rule = new FlowRule();
-        rule.setResource("sentinelA");
-        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
-        // Set limit QPS to 20.
-        rule.setCount(2);
-        rules.add(rule);
-        FlowRuleManager.loadRules(rules);
-    }
 }

@@ -5,6 +5,7 @@ import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import com.bitbybit.consumer.remote.api.ProviderApi;
 import com.bitbybit.consumer.remote.api.ProviderApiSentinel;
+import com.bitbybit.consumer.remote.api.ProviderApiSentinelFeign;
 import com.bitbybit.consumer.service.ProviderService;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
@@ -39,6 +40,10 @@ public class ConsumerController {
     @Autowired
     ProviderService providerService;
 
+    @Autowired
+    ProviderApiSentinelFeign providerApiSentinelFeign;
+
+
     @GetMapping("consumer/ratelimiter")
     public Integer ratelimiter() {
         return providerApi.ratelimiter();
@@ -61,7 +66,7 @@ public class ConsumerController {
         Map<String, List> result = new HashMap<>();
         List<Bulkhead> bulkheads = allBulkheads.collect(Collectors.toList());
         List<RateLimiter> rateLimiters = allRateLimiters.collect(Collectors.toList());
-        result.put("bulkhead",bulkheads);
+        result.put("bulkhead", bulkheads);
         result.put("rateLimiter", rateLimiters);
         return result;
     }
@@ -77,7 +82,7 @@ public class ConsumerController {
         Map<String, List> result = new HashMap<>();
         List<Bulkhead> bulkheads = allBulkheads.collect(Collectors.toList());
         List<RateLimiter> rateLimiters = allRateLimiters.collect(Collectors.toList());
-        result.put("bulkhead",bulkheads);
+        result.put("bulkhead", bulkheads);
         result.put("rateLimiter", rateLimiters);
         return result;
     }
@@ -97,5 +102,33 @@ public class ConsumerController {
     @GetMapping("consumer/sentinel")
     public Integer seninel() {
         return providerService.seninel(123L);
+    }
+
+    @GetMapping("consumer/sentinel/feign")
+    public Integer sentinelFeign() {
+        return providerApiSentinelFeign.sentinel();
+    }
+
+    @PostConstruct
+    void initFlowRules() {
+        // 还未支持feign的rule
+        List<FlowRule> rules = new ArrayList<>();
+        FlowRule rule = new FlowRule();
+        rule.setResource("sentinelA");
+        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        // Set limit QPS to 20.
+        rule.setCount(2);
+        rules.add(rule);
+
+
+        // feign支持ruleB
+        FlowRule ruleFeign = new FlowRule();
+        ruleFeign.setResource("GET:http://PROVIDER/provider/ratelimiter");
+        ruleFeign.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        // Set limit QPS to 20.
+        ruleFeign.setCount(4);
+        rules.add(rule);
+
+        FlowRuleManager.loadRules(rules);
     }
 }
