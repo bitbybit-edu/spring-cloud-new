@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@FeignClient(name = "PROVIDER",contextId = "context4", fallback = ProviderApiSentinelFeign.SentinelFeignFallback.class, fallbackFactory =ProviderApiSentinelFeign.SentinelFeignFallback.class )
+@FeignClient(name = "PROVIDER",contextId = "context4", fallback = ProviderApiSentinelFeign.SentinelFeignFallback.class )
 public interface ProviderApiSentinelFeign {
 
     @GetMapping("/provider/ratelimiter")
@@ -16,6 +16,7 @@ public interface ProviderApiSentinelFeign {
 
         @Override
         public Integer sentinel() {
+
             return -5;
         }
     }

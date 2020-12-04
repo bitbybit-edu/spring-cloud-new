@@ -127,7 +127,7 @@ public class ConsumerController {
         ruleFeign.setGrade(RuleConstant.FLOW_GRADE_QPS);
         // Set limit QPS to 20.
         ruleFeign.setCount(4);
-        rules.add(rule);
+        rules.add(ruleFeign);
 
         FlowRuleManager.loadRules(rules);
     }
